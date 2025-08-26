@@ -140,7 +140,32 @@ TEST_CASE( "Testing PlaneProbingParallelepipedEstimator" )
         REQUIRE(nbNormals == nbOk);
     }
 
-#ifdef WITH_GMP
+    SECTION("L-algorithm should return the correct normal and a reduced basis")
+    {
+        int nbNormals = 0;
+        int nbOk = 0;
+
+        for (const auto& n: NORMALS) {
+            for (int height = 0; height < min(int(n.normInfinity()), MAX_HEIGHT); ++height) {
+                ++nbNormals;
+
+                TestPlaneProbingParallelepipedEstimator<int, ProbingMode::L>::compute
+                    (n, height,
+                     [&] (TestPlaneProbingParallelepipedEstimator<int, ProbingMode::L>::Estimator& estimator) {
+                        auto estimated = estimator.compute();
+                        bool isReduced = estimator.isReduced();
+
+                        if (estimated == n && isReduced)
+                        {
+                            nbOk++;
+                        }
+                     });
+            }
+        }
+
+        REQUIRE(nbNormals == nbOk);
+    }    
+
     SECTION("H-algorithm should return the correct normal with BigInteger")
     {
         int nbNormals = 0;
@@ -165,7 +190,6 @@ TEST_CASE( "Testing PlaneProbingParallelepipedEstimator" )
 
         REQUIRE(nbNormals == nbOk);
     }
-#endif
 }
 
 /** @ingroup Tests **/

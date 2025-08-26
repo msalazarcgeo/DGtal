@@ -69,7 +69,7 @@ jobs:
         if: steps.get_round.outputs.result == 'builddoc'
         run: |
           set -x
-          sudo apt-get update && sudo apt-get install -y graphviz ssh doxygen libboost-dev texlive-latex-base
+          sudo apt-get update && sudo apt-get install -y graphviz ssh doxygen  texlive-latex-base
           git config --global user.email "dgtal@dgtal.org"
           git config --global user.name "DGtal"
 
@@ -78,7 +78,7 @@ jobs:
         if: steps.get_round.outputs.result == 'builddoc'
         run: |
           set -ex
-          mkdir -p build_doc && cd build_doc && cmake .. -DBUILD_EXAMPLES=true -DBUILD_TESTING=true
+          mkdir -p build_doc && cd build_doc && cmake .. -DDGTAL_BUILD_EXAMPLES=true -DDGTAL_BUILD_TESTS=true
 
 
       - name: build doc
@@ -107,8 +107,8 @@ jobs:
         run: |
           mkdir pr${{ steps.get_pr_number.outputs.result }}
           mv ${{runner.workspace}}/DGtal/build_doc/html/* pr${{ steps.get_pr_number.outputs.result }}/
-          git clone --depth 2 https://github.com/DGtal-team/doc-nightly.git
-          cd doc-nightly
+          git clone --depth 2 https://github.com/DGtal-team/doc-pr.git
+          cd doc-pr
           rm -rf pr${{ steps.get_pr_number.outputs.result }}
           mv ../pr${{ steps.get_pr_number.outputs.result }} .
 
@@ -117,9 +117,9 @@ jobs:
         uses: JamesIves/github-pages-deploy-action@v4.4.1
         with:
           token: ${{ secrets.DEPLOYACTION }}
-          repository-name: DGtal-team/doc-nightly
-          folder: doc-nightly
-          branch: master
+          repository-name: DGtal-team/doc-pr
+          folder: doc-pr
+          branch: main
           single-commit: true
           clean: true
 
@@ -131,7 +131,7 @@ jobs:
             const tmp_round = "${{ steps.get_round.outputs.result }}";
             const id = tmp_round.indexOf(":");
             const round = tmp_round.substring(0,id);
-            const address = "The documentation is built. It will be available, after a few minutes, here: https://dgtal-team.github.io/doc-nightly/pr${{ steps.get_pr_number.outputs.result }}/index.html"
+            const address = "The documentation is built. It will be available, after a few minutes, here: https://dgtal-team.github.io/doc-pr/pr${{ steps.get_pr_number.outputs.result }}/index.html"
             github.rest.issues.createComment({
               owner: "DGtal-team",
               repo: "DGtal",
@@ -186,7 +186,7 @@ jobs:
         if: steps.get_round.outputs.result == 'fullbuild'
         run: |
           set -x
-          sudo apt-get update && sudo apt-get install -y libqglviewer-dev-qt5 libboost-dev ninja-build libhdf5-serial-dev libboost-dev libcairo2-dev libgmp-dev libfftw3-dev libinsighttoolkit4-dev
+          sudo apt-get update && sudo apt-get install -y libqglviewer-dev-qt5 libboost-dev ninja-build libhdf5-serial-dev libboost-dev libcairo2-dev libfftw3-dev  libinsighttoolkit5-dev
           git config --global user.email "dgtal@dgtal.org"
           git config --global user.name "DGtal"
 
@@ -214,7 +214,7 @@ jobs:
         if: steps.get_round.outputs.result == 'fullbuild'
         run: |
           cmake -E make_directory ${{runner.workspace}}/build
-          cmake -S ${{runner.workspace}}/DGtal -B ${{runner.workspace}}/build -DBUILD_EXAMPLES=true -DBUILD_TESTING=true -DDGTAL_RANDOMIZED_TESTING_THRESHOLD=100 -DWITH_OPENMP=true -DWITH_GMP=true -DWITH_FFTW3=true -DWARNING_AS_ERROR=ON -DWITH_HDF5=true -DWITH_QGLVIEWER=true -DWITH_CAIRO=true  -DWITH_EIGEN=true  -DWITH_ITK=true -DDGTAL_ENABLE_FLOATING_POINT_EXCEPTIONS=true -G Ninja
+          cmake -S ${{runner.workspace}}/DGtal -B ${{runner.workspace}}/build -DDGTAL_BUILD_EXAMPLES=true -DDGTAL_BUILD_TESTS=true -DDGTAL_RANDOMIZED_TESTING_THRESHOLD=100 -DDGTAL_WITH_OPENMP=true -DDGTAL_WITH_FFTW3=true -DDGTAL_WARNING_AS_ERROR=ON - DDGTAL_WITH_HDF5=true -DDGTAL_WITH_POLYSCOPE_VIEWER=true  -DDGTAL_WITH_CAIRO=true -DDGTAL_WITH_ITK=true -DDGTAL_ENABLE_FLOATING_POINT_EXCEPTIONS=true -G Ninja
           cd ${{runner.workspace}}/build
           cmake --build .
           export TESTBLACKLIST="(testLinearStructure)"

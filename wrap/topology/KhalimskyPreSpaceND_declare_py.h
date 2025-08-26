@@ -17,6 +17,11 @@
 #ifndef DGTAL_KHALIMSKYPRESPACEND_DECLARE_PY_H
 #define DGTAL_KHALIMSKYPRESPACEND_DECLARE_PY_H
 
+#if defined (_MSC_VER) and !defined(ssize_t)
+    // ssize_t is not standard, only posix which is not supported by MSVC
+    #define ssize_t ptrdiff_t
+#endif
+
 #include "dgtal_pybind11_common.h"
 
 #include "DGtal/topology/KhalimskyPreSpaceND.h"
@@ -229,7 +234,6 @@ pybind11::class_<TKhalimskyPreSpaceND> declare_KhalimskyPreSpaceND(pybind11::mod
     const std::string &typestr) {
     namespace py = pybind11;
     using TT = TKhalimskyPreSpaceND;
-    using TTInteger = typename TT::Integer;
     using TTPoint = typename TT::Point;
     using TTDimension = typename TTPoint::Dimension;
     using TTCell = typename TT::Cell;

@@ -65,7 +65,7 @@ standardDigitalPolyhedronBuilder3D ../examples/samples/lion-tri.obj 0.5 31
 #include <queue>
 #include "DGtal/base/Common.h"
 #include "DGtal/helpers/StdDefs.h"
-#include "DGtal/io/viewers/Viewer3D.h"
+#include "DGtal/io/viewers/PolyscopeViewer.h"
 #include "DGtal/shapes/Shapes.h"
 #include "DGtal/shapes/SurfaceMesh.h"
 #include "DGtal/io/readers/SurfaceMeshReader.h"
@@ -140,11 +140,8 @@ int main( int argc, char** argv )
       return 1;
     }
 
-  QApplication application(argc,argv);
-  typedef Viewer3D<Space,KSpace> MViewer;
+  typedef PolyscopeViewer<Space,KSpace> MViewer;
   MViewer viewer;
-  viewer.setWindowTitle("standardDigitalPolyhedronBuilder3D");
-  viewer.show();  
 
   Point lo(-500,-500,-500);
   Point up(500,500,500);
@@ -167,13 +164,13 @@ int main( int argc, char** argv )
   std::vector< Plane > face_planes;
   face_planes.resize( surfmesh.nbFaces() );
   bool planarity = true;
-  for ( int f = 0; f < surfmesh.nbFaces() && planarity; ++f )
+  for ( size_t f = 0; f < surfmesh.nbFaces() && planarity; ++f )
     {
       PointRange X;
       for ( auto v : faceVertices[ f ] )
         X.push_back( vertices[ v ] );
       face_planes[ f ] = Plane( X[ 0 ], X[ 1 ], X[ 2 ] );
-      for ( int v = 3; v < X.size(); v++ )
+      for ( size_t v = 3; v < X.size(); v++ )
         if ( ! face_planes[ f ]( X[ v ] ) )
           {
             trace.error() << "Face " << f << " is not planar." << std::endl;
@@ -183,14 +180,14 @@ int main( int argc, char** argv )
   trace.endBlock();
   if ( ! planarity ) return 1;
   trace.beginBlock( "Computing polyhedron" );
-  for ( int f = 0; f < surfmesh.nbFaces(); ++f )
+  for ( size_t f = 0; f < surfmesh.nbFaces(); ++f )
     {
       PointRange X;
       for ( auto v : faceVertices[ f ] )
         X.push_back( vertices[ v ] );
       auto F = dconv.relativeEnvelope( X, face_planes[ f ], Algorithm::DIRECT );
       faces_set.insert( F.cbegin(), F.cend() );
-      for ( int i = 0; i < X.size(); i++ )
+      for ( size_t i = 0; i < X.size(); i++ )
         {
           PointRange Y { X[ i ], X[ (i+1)%X.size() ] };
           if ( Y[ 1 ] < Y[ 0 ] ) std::swap( Y[ 0 ], Y[ 1 ] ); 
@@ -246,36 +243,37 @@ int main( int argc, char** argv )
       Color::Magenta, Color( 200, 200, 200 ) };
   if ( view & 0x1 )
     {
-      viewer.setLineColor( colors[ 0 ] );
-      viewer.setFillColor( colors[ 0 ] );
+      viewer.drawColor( colors[ 0 ] );
+      viewer.drawColor( colors[ 0 ] );
       for ( auto p : vertices ) viewer << p;
     }
   if ( view & 0x2 )
     {
-      viewer.setLineColor( colors[ 3 ] );
-      viewer.setFillColor( colors[ 3 ] );
+      viewer.drawColor( colors[ 3 ] );
+      viewer.drawColor( colors[ 3 ] );
       for ( auto p : final_arc_points ) viewer << p;
     }
   if ( view & 0x4 )
     {
-      viewer.setLineColor( colors[ 1 ] );
-      viewer.setFillColor( colors[ 1 ] );
+      viewer.drawColor( colors[ 1 ] );
+      viewer.drawColor( colors[ 1 ] );
       for ( auto p : pos_edge_points ) viewer << p;
     }
   if ( view & 0x8 )
     {
-      viewer.setLineColor( colors[ 2 ] );
-      viewer.setFillColor( colors[ 2 ] );
+      viewer.drawColor( colors[ 2 ] );
+      viewer.drawColor( colors[ 2 ] );
       for ( auto p : neg_edge_points ) viewer << p;
     }
   if ( view & 0x10 )
     {
-      viewer.setLineColor( colors[ 4 ] );
-      viewer.setFillColor( colors[ 4 ] );
+      viewer.drawColor( colors[ 4 ] );
+      viewer.drawColor( colors[ 4 ] );
       for ( auto p : face_points ) viewer << p;
     }
-  viewer << MViewer::updateDisplay;
-  return application.exec();
+
+  viewer.show();  
+  return 0;
 
 }
 //                                                                           //

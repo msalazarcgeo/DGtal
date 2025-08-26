@@ -97,7 +97,7 @@ makeColorMap( double min_value, double max_value )
   return gradcmap;
 }
 
-void usage( int argc, char* argv[] )
+void usage( char* argv[] )
 {
   using namespace DGtal;
   using namespace DGtal::Z3i;
@@ -127,7 +127,7 @@ int main( int argc, char* argv[] )
 {
   if ( argc <= 1 )
     {
-      usage( argc, argv );
+      usage( argv );
       return 0;
     }
   //! [curvature-comparator-Typedefs]
@@ -191,7 +191,7 @@ int main( int argc, char* argv[] )
   auto pointels = SH::getPointelRange( c2i, surface );
   auto vertices = SH::RealPoints( pointels.size() );
   std::transform( pointels.cbegin(), pointels.cend(), vertices.begin(),
-                  [&] (const SH::Cell& c) { return h * embedder( c ); } ); 
+                  [&] (const SH::Cell& cell) { return h * embedder( cell ); } ); 
   for ( auto&& surfel : surfels )
     {
       const auto primal_surfel_vtcs = SH::getPointelRange( K, surfel );
@@ -238,7 +238,7 @@ int main( int argc, char* argv[] )
   trace.info() << "CNC measuring radius = " << cnc_mr << std::endl;
   std::vector< double > H( smesh.nbFaces() );
   std::vector< double > G( smesh.nbFaces() );
-  for ( auto f = 0; f < smesh.nbFaces(); ++f )
+  for ( size_t f = 0; f < smesh.nbFaces(); ++f )
     {
       const auto b    = smesh.faceCentroid( f );
       const auto area = mu0.measure( b, cnc_mr, f );

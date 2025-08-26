@@ -17,6 +17,11 @@
 #ifndef DGTAL_KHALIMSKYSPACEND_DECLARE_PY_H
 #define DGTAL_KHALIMSKYSPACEND_DECLARE_PY_H
 
+#if defined (_MSC_VER) and !defined(ssize_t)
+    // ssize_t is not standard, only posix which is not supported by MSVC
+    #define ssize_t ptrdiff_t
+#endif
+
 #include "dgtal_pybind11_common.h"
 
 #include "DGtal/topology/KhalimskySpaceND.h"
@@ -27,7 +32,6 @@ pybind11::class_<TKhalimskyCell> declare_KhalimskyCell_common(pybind11::module &
     const std::string &typestr) {
     namespace py = pybind11;
     using TT = TKhalimskyCell;
-    using TTInteger = typename TT::Integer;
     using TTPoint = typename TT::Point;
 
     const std::string docs =
@@ -86,8 +90,6 @@ pybind11::class_<TKhalimskyCell> declare_KhalimskyCell(pybind11::module &m,
     const std::string &typestr) {
     namespace py = pybind11;
     using TT = TKhalimskyCell;
-    using TTPoint = typename TT::Point;
-    using TTInteger = typename TT::Integer;
     using TTPreCell = typename TT::PreCell;
     auto py_class = declare_KhalimskyCell_common<TT>(m, typestr);
 
@@ -121,9 +123,7 @@ pybind11::class_<TKhalimskyCell> declare_SignedKhalimskyCell(pybind11::module &m
     const std::string &typestr) {
     namespace py = pybind11;
     using TT = TKhalimskyCell;
-    using TTPoint = typename TT::Point;
     using TTSPreCell = typename TT::SPreCell;
-    using TTInteger = typename TT::Integer;
     auto py_class = declare_KhalimskyCell_common<TT>(m, typestr);
 
     py_class.def_property_readonly_static("TSPreCell",
@@ -158,7 +158,6 @@ pybind11::class_<TKhalimskySpaceND> declare_KhalimskySpaceND(pybind11::module &m
     const std::string &typestr) {
     namespace py = pybind11;
     using TT = TKhalimskySpaceND;
-    using TTInteger = typename TT::Integer;
     using TTPoint = typename TT::Point;
     using TTDimension = typename TTPoint::Dimension;
     using TTCell = typename TT::Cell;

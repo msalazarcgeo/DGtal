@@ -1,0 +1,8 @@
+[requires]
+fmt/9.1.0
+zlib/1.2.13
+fftw/3.3.9
+
+[generators]
+CMakeDeps
+CMakeToolchain

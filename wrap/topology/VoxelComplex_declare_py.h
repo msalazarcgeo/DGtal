@@ -17,6 +17,11 @@
 #ifndef DGTAL_VOXELCOMPLEX_DECLARE_PY_H
 #define DGTAL_VOXELCOMPLEX_DECLARE_PY_H
 
+#if defined (_MSC_VER) and !defined(ssize_t)
+    // ssize_t is not standard, only posix which is not supported by MSVC
+    #define ssize_t ptrdiff_t
+#endif
+
 #include "dgtal_pybind11_common.h"
 
 #include "DGtal/topology/VoxelComplex.h"
@@ -33,7 +38,6 @@ pybind11::class_<TVoxelComplex> declare_VoxelComplex(pybind11::module &m,
     using TTKSpace = typename TT::KSpace;
     using TTPoint = typename TTKSpace::Point;
     using TTCell = typename TT::Cell;
-    using TTPreCell = typename TT::PreCell;
     using TTData = typename TT::Data;
 
     const std::string docs =

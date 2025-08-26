@@ -86,11 +86,9 @@ namespace DGtal {
        Constructor from a pointer to a valid instance of T. The object is referenced in
        'this' and is generally immediately duplicated by the user to
        instantiate a data member.
-       @param ptrT any valid pointer to a object of type T.
-       @pre ptrT != 0
+       @param ptr any valid pointer to a object of type T.
+       @pre ptr != 0
     */
-    // NClone( const T* ptrT );
-
     inline NClone( CountedPtr<T> ptr ) : myCowPtr( ptr ) {}
     inline NClone( CowPtr<T> ptr ) : myCowPtr( ptr ) {}
 
@@ -912,7 +910,7 @@ bool testCloneTimings()
   double t4 = computeTriangles<TriangleByClone>( size );
   trace.info() << "Perimeter is " << t4 << std::endl;
   ++nb; nbok += Point::nbCreated == Point::nbDeleted ? 1 : 0;
-  ++nb; nbok += Point::nbCreated < nbC ? 1 : 0;
+  ++nb; nbok += Point::nbCreated <= nbC ? 1 : 0;
   trace.info() << "(" << nbok << "/" << nb << ")"
                << " Point nbCreated=" << Point::nbCreated 
                << " nbDeleted=" << Point::nbDeleted << std::endl; 

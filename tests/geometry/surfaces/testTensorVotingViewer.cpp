@@ -50,7 +50,7 @@
 #include "DGtal/shapes/implicit/ImplicitBall.h"
 #include "DGtal/shapes/GaussDigitizer.h"
 
-#include "DGtal/io/viewers/Viewer3D.h"
+#include "DGtal/io/viewers/PolyscopeViewer.h"
 #include "DGtal/io/colormaps/GradientColorMap.h"
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -67,7 +67,7 @@ using namespace DGtal;
  *
  */
 template<typename Shape>
-bool testLocalEstimatorFromFunctorAdapter(int argc, char **argv)
+bool testLocalEstimatorFromFunctorAdapter()
 {
   unsigned int nbok = 0;
   unsigned int nb = 0;
@@ -130,36 +130,22 @@ bool testLocalEstimatorFromFunctorAdapter(int argc, char **argv)
   double maxval = *std::max_element(values.begin(), values.end());
   double minval = *std::min_element(values.begin(), values.end());
   trace.info() << "Min/max= "<< minval<<"/"<<maxval<<std::endl;
-  QApplication application( argc, argv );
-  typedef Viewer3D<Z3i::Space, Z3i::KSpace> Viewer;
+  typedef PolyscopeViewer<Z3i::Space, Z3i::KSpace> Viewer;
   Viewer viewer( K );
-  viewer.setWindowTitle("Features from Tensor Voting");
-  viewer.show();
+  viewer.allowReuseList = true; // Group elements together
 
-  typedef GradientColorMap< double > Gradient;
-  Gradient cmap_grad( minval, maxval );
-  cmap_grad.addColor( Color( 50, 50, 255 ) );
-  cmap_grad.addColor( Color( 255, 0, 0 ) );
-  cmap_grad.addColor( Color( 255, 255, 10 ) );
-
-
-  viewer << SetMode3D((*(surface.begin())).className(), "Basic" );
   unsigned int i=0;
   
   for(typename Surface::ConstIterator it = surface.begin(), itend=surface.end();
       it!= itend;
       ++it, ++i)
     {
-      viewer << CustomColors3D( Color::Black, cmap_grad( values[ i ] ))
-             <<  *it ;    
+      viewer << WithQuantity(*it, "value", values[i]);
     }
   
-  
-  viewer << Viewer3D<>::updateDisplay;
-  
   trace.endBlock();
-  application.exec();
 
+  viewer.show();
   return true;
 }
 
@@ -174,8 +160,8 @@ int main( int argc, char** argv )
     trace.info() << " " << argv[ i ];
   trace.info() << endl;
 
-  bool res = testLocalEstimatorFromFunctorAdapter<ImplicitHyperCube<Z3i::Space> >(argc,argv)
-    && testLocalEstimatorFromFunctorAdapter<ImplicitBall<Z3i::Space> >(argc,argv);
+  bool res = testLocalEstimatorFromFunctorAdapter<ImplicitHyperCube<Z3i::Space> >()
+    && testLocalEstimatorFromFunctorAdapter<ImplicitBall<Z3i::Space> >();
   
   trace.emphase() << ( res ? "Passed." : "Error." ) << endl;
   trace.endBlock();

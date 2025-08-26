@@ -105,7 +105,7 @@ makeColorMap( double min_value, double max_value )
   return gradcmap;
 }
 
-void usage( int argc, char* argv[] )
+void usage( char* argv[] )
 {
   std::cout << "Usage: " << std::endl
             << "\t" << argv[ 0 ] << " <shape> <m> <n> <R>" << std::endl
@@ -125,7 +125,7 @@ int main( int argc, char* argv[] )
 {
   if ( argc <= 1 )
     {
-      usage( argc, argv );
+      usage( argv );
       return 0;
     }
   //! [curvature-measures-Typedefs]
@@ -194,7 +194,7 @@ int main( int argc, char* argv[] )
   // estimates mean (H) and Gaussian (G) curvatures by measure normalization.
   std::vector< double > H( smesh.nbFaces() );
   std::vector< double > G( smesh.nbFaces() );
-  for ( auto f = 0; f < smesh.nbFaces(); ++f )
+  for ( size_t f = 0; f < smesh.nbFaces(); ++f )
     {
       const auto b    = smesh.faceCentroid( f );
       const auto area = mu0.measure( b, R, f );
@@ -226,7 +226,7 @@ int main( int argc, char* argv[] )
   const auto colormapG = makeQuantifiedColorMap( makeColorMap( -0.625, 0.625 ) );
   auto colorsH = SMW::Colors( smesh.nbFaces() );
   auto colorsG = SMW::Colors( smesh.nbFaces() );
-  for ( auto i = 0; i < smesh.nbFaces(); i++ )
+  for ( size_t i = 0; i < smesh.nbFaces(); i++ )
     {
       colorsH[ i ] = colormapH( H[ i ] );
       colorsG[ i ] = colormapG( G[ i ] );

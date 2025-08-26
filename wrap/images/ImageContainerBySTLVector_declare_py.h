@@ -17,6 +17,11 @@
 #ifndef DGTAL_IMAGECONTAINERBYSTLVECTOR_DECLARE_PY_H
 #define DGTAL_IMAGECONTAINERBYSTLVECTOR_DECLARE_PY_H
 
+#if defined (_MSC_VER) and !defined(ssize_t)
+    // ssize_t is not standard, only posix which is not supported by MSVC
+    #define ssize_t ptrdiff_t
+#endif
+
 #include "dgtal_pybind11_common.h"
 #include <pybind11/numpy.h> // for py::array_t
 
@@ -64,14 +69,14 @@ using Is3D = typename std::enable_if<TPoint::dimension == 3>::type;
 template<typename TT>
 void def_toindices(pybind11::class_<TT> & py_class,
         Is2D<typename TT::Point> * = nullptr) {
-    py_class.def("toindices", [](const TT & self, const typename TT::Point & a_point) {
+    py_class.def("toindices", [](const TT &, const typename TT::Point & a_point) {
             return pybind11::make_tuple(a_point[1], a_point[0]);
     }, "Return tuple of the i,j,k-coordinates of the input point in the c_style format: (k,j,i)");
 }
 template<typename TT>
 void def_toindices(pybind11::class_<TT> & py_class,
         Is3D<typename TT::Point> * = nullptr) {
-    py_class.def("toindices", [](const TT & self, const typename TT::Point & a_point) {
+    py_class.def("toindices", [](const TT &, const typename TT::Point & a_point) {
             return pybind11::make_tuple(a_point[2], a_point[1], a_point[0]);
     }, "Return tuple of the i,j,k-coordinates of the input point in the c_style format: (k,j,i)");
 }
@@ -148,7 +153,6 @@ void def_buffer_bridge(
     namespace py = pybind11;
     using TTPoint = typename TT::Point;
     using TTValue = typename TT::Value;
-    using TTDomain = typename TT::Domain;
     // ----------------------- Bridges ----------------------------------------
     // Python buffers (requires py::buffer_protocol in py_class instantiation)
     /* Implements interface with the buffer protocol.
@@ -499,7 +503,22 @@ TT constructor_from_buffer_point_container(pybind11::buffer buf,
     assert( /* The container should be simple enough for memory to be continuous */
             containersize == componentsize * TTContainer::size());
     // Populate data of the container, copy is needed, vector has to own its memory.
+
+#if defined(__GNUG__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wclass-memaccess"
+#endif
+#if defined(__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wclass-memaccess"
+#endif
     memcpy(out.data(), static_cast<TTComponent*>(info.ptr), info.size * componentsize);
+#if defined(__GNUG__)
+#pragma GCC diagnostic pop
+#endif
+#if defined(__clang__)
+#pragma clang diagnostic pop
+#endif
     return out;
 }
 
@@ -508,7 +527,6 @@ void def_buffer_bridge_for_PointVector(
         pybind11::class_<TT> & py_class) {
     namespace py = pybind11;
     using TTPoint = typename TT::Point;
-    using TTDomain = typename TT::Domain;
     using TTContainer = typename TT::Value;
 
     // ----------------------- Bridges ----------------------------------------
